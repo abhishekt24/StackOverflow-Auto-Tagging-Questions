@@ -15,7 +15,7 @@
 
 # ### Text preprocessing
 
-# In[6]:
+# In[1]:
 
 
 import nltk
@@ -25,9 +25,9 @@ from nltk.corpus import stopwords
 
 # For this and most of the following assignments you will need to use a list of stop words. It can be downloaded from *nltk*:
 
-# In this task you will deal with a dataset of post titles from StackOverflow. You are provided a split to 3 sets: *train*, *validation* and *test*. All corpora (except for *test*) contain titles of the posts and corresponding tags (100 tags are available). The *test* set is provided for Coursera's grading and doesn't contain answers. Upload the corpora using *pandas* and look at the data:
+# In this task you will deal with a dataset of post titles from StackOverflow. We are provided a split to 3 sets: *train*, *validation* and *test*. All corpora (except for *test*) contain titles of the posts and corresponding tags (100 tags are available). The *test*  doesn't contain answers. Upload the corpora using *pandas* and look at the data:
 
-# In[7]:
+# In[2]:
 
 
 from ast import literal_eval
@@ -35,7 +35,7 @@ import pandas as pd
 import numpy as np
 
 
-# In[8]:
+# In[3]:
 
 
 def read_data(filename):
@@ -44,7 +44,7 @@ def read_data(filename):
     return data
 
 
-# In[9]:
+# In[4]:
 
 
 train = read_data('data/train.tsv')
@@ -52,7 +52,7 @@ validation = read_data('data/validation.tsv')
 test = pd.read_csv('data/test.tsv', sep='\t')
 
 
-# In[10]:
+# In[5]:
 
 
 train.head(10)
@@ -62,7 +62,7 @@ train.head(10)
 
 # For a more comfortable usage, initialize *X_train*, *X_val*, *X_test*, *y_train*, *y_val*.
 
-# In[11]:
+# In[6]:
 
 
 X_train, y_train = train['title'].values, train['tags'].values
@@ -74,13 +74,13 @@ X_test = test['title'].values
 # 
 # **Task 1 (TextPrepare).** Implement the function *text_prepare* following the instructions. After that, run the function *test_test_prepare* to test it on tiny cases and submit it to Coursera.
 
-# In[12]:
+# In[7]:
 
 
 import re
 
 
-# In[13]:
+# In[8]:
 
 
 REPLACE_BY_SPACE_RE = re.compile('[/(){}\[\]\|@,;]')
@@ -97,14 +97,12 @@ def text_prepare(text):
     text=re.sub(BAD_SYMBOLS_RE,'',text)#text = # delete symbols which are in BAD_SYMBOLS_RE from text
     #text=re.sub(STOPWORDS,"",text)#text = # delete stopwords from text
     #for w in STOPWORDS:
-      #  text=text.replace(w,'')
     text=' '.join(i for i in text.split() if i not in STOPWORDS)
     print (text)
     return text
-text_prepare("ADSF [// ] \ @FSD nds\\")
 
 
-# In[14]:
+# In[9]:
 
 
 def test_text_prepare():
@@ -118,15 +116,13 @@ def test_text_prepare():
     return 'Basic tests are passed.'
 
 
-# In[15]:
+# In[10]:
 
 
 print(test_text_prepare())
 
 
-# Run your implementation for questions from file *text_prepare_tests.tsv* to earn the points.
-
-# In[16]:
+# In[11]:
 
 
 prepared_questions = []
@@ -138,15 +134,16 @@ text_prepare_results = '\n'.join(prepared_questions)
 
 # Now we can preprocess the titles using function *text_prepare* and  making sure that the headers don't have bad symbols:
 
-# In[17]:
+# In[ ]:
 
 
 X_train = [text_prepare(x) for x in X_train]
 X_val = [text_prepare(x) for x in X_val]
 X_test = [text_prepare(x) for x in X_test]
+print('done')
 
 
-# In[18]:
+# In[13]:
 
 
 X_train[:3]
@@ -156,7 +153,7 @@ X_train[:3]
 # 
 # **Task 2 (WordsTagsCount).** Find 3 most popular tags and 3 most popular words in the train data and submit the results to earn the points.
 
-# In[19]:
+# In[14]:
 
 
 # Dictionary of all tags from train corpus with their counts.
@@ -192,7 +189,7 @@ print(tags_counts)
 # 
 # Pay attention that in this assignment you should not submit frequencies or some additional information.
 
-# In[20]:
+# In[15]:
 
 
 most_common_tags = sorted(tags_counts.items(), key=lambda x: x[1], reverse=True)[:3]
@@ -240,7 +237,7 @@ most_common_words = sorted(words_counts.items(), key=lambda x: x[1], reverse=Tru
 #    
 # Implement the described encoding in the function *my_bag_of_words* with the size of the dictionary equals to 5000. To find the most common words use train data. You can test your code using the function *test_my_bag_of_words*.
 
-# In[21]:
+# In[16]:
 
 
 DICT_SIZE = 5000
@@ -272,7 +269,7 @@ def my_bag_of_words(text, words_to_index, dict_size):
     return result_vector
 
 
-# In[22]:
+# In[17]:
 
 
 def test_my_bag_of_words():
@@ -285,7 +282,7 @@ def test_my_bag_of_words():
     return 'Basic tests are passed.'
 
 
-# In[23]:
+# In[18]:
 
 
 print(test_my_bag_of_words())
@@ -293,13 +290,13 @@ print(test_my_bag_of_words())
 
 # Now apply the implemented function to all samples (this might take up to a minute):
 
-# In[24]:
+# In[19]:
 
 
 from scipy import sparse as sp_sparse
 
 
-# In[26]:
+# In[ ]:
 
 
 X_train_mybag = sp_sparse.vstack([sp_sparse.csr_matrix(my_bag_of_words(text, WORDS_TO_INDEX, DICT_SIZE)) for text in X_train])
@@ -314,7 +311,7 @@ print('X_test shape ', X_test_mybag.shape)
 
 # **Task 3 (BagOfWords).** For the 11th row in *X_train_mybag* find how many non-zero elements it has. In this task the answer (variable *non_zero_elements_count*) should be a number, e.g. 20.
 
-# In[27]:
+# In[21]:
 
 
 row = X_train_mybag[10].toarray()[0]
@@ -329,13 +326,13 @@ non_zero_elements_count =np.count_nonzero(row) ####### YOUR CODE HERE #######
 # 
 # Implement function *tfidf_features* using class [TfidfVectorizer](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html) from *scikit-learn*. Use *train* corpus to train a vectorizer. Don't forget to take a look into the arguments that you can pass to it. We suggest that you filter out too rare words (occur less than in 5 titles) and too frequent words (occur more than in 90% of the titles). Also, use bigrams along with unigrams in your vocabulary. 
 
-# In[28]:
+# In[22]:
 
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
-# In[29]:
+# In[23]:
 
 
 def tfidf_features(X_train, X_val, X_test):
@@ -364,14 +361,14 @@ def tfidf_features(X_train, X_val, X_test):
 # 
 # In this case, check whether you have c++ or c# in your vocabulary, as they are obviously important tokens in our tags prediction task:
 
-# In[30]:
+# In[24]:
 
 
 X_train_tfidf, X_val_tfidf, X_test_tfidf, tfidf_vocab = tfidf_features(X_train, X_val, X_test)
 tfidf_reversed_vocab = {i:word for word,i in tfidf_vocab.items()}
 
 
-# In[31]:
+# In[25]:
 
 
 ######### YOUR CODE HERE #############
@@ -384,23 +381,36 @@ for i in tfidf_reversed_vocab.keys():
 
 # Now, use this transormation for the data and check again.
 
-# In[32]:
+# In[26]:
 
 
 ######### YOUR CODE HERE #############
+from sklearn.feature_extraction.text import CountVectorizer
+def n_grams():
+    vect = CountVectorizer(min_df=5, ngram_range=(1,2)).fit(X_train)
+    X_train_vectorized = vect.transform(X_train)
+    X_val_vectorized= vect.transform(X_val)
+    return X_train_vectorized,X_val_vectorized
+
+
+# In[27]:
+
+
+X_train_ng,X_val_ng=n_grams()
+X_train_ng
 
 
 # ### MultiLabel classifier
 # 
 # As we have noticed before, in this task each example can have multiple tags. To deal with such kind of prediction, we need to transform labels in a binary form and the prediction will be a mask of 0s and 1s. For this purpose it is convenient to use [MultiLabelBinarizer](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MultiLabelBinarizer.html) from *sklearn*.
 
-# In[33]:
+# In[28]:
 
 
 from sklearn.preprocessing import MultiLabelBinarizer
 
 
-# In[34]:
+# In[29]:
 
 
 mlb = MultiLabelBinarizer(classes=sorted(tags_counts.keys()))
@@ -410,14 +420,14 @@ y_val = mlb.transform(y_val)
 
 # Implement the function *train_classifier* for training a classifier. In this task we suggest to use One-vs-Rest approach, which is implemented in [OneVsRestClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.multiclass.OneVsRestClassifier.html) class. In this approach *k* classifiers (= number of tags) are trained. As a basic classifier, use [LogisticRegression](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html). It is one of the simplest methods, but often it performs good enough in text classification tasks. It might take some time, because a number of classifiers to train is large.
 
-# In[35]:
+# In[30]:
 
 
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.linear_model import LogisticRegression, RidgeClassifier
 
 
-# In[36]:
+# In[31]:
 
 
 def train_classifier(X_train, y_train):
@@ -428,29 +438,33 @@ def train_classifier(X_train, y_train):
     """
     
     # Create and fit LogisticRegression wraped into OneVsRestClassifier.
-   # clf= LogisticRegression(random_state=0, multi_class='ovr')
+    #clf= LogisticRegression(random_state=0, multi_class='ovr',penalty='l2,C=1.0)
     #print(X_train.getnnz())
     #print(len(y_train))
-    clf = OneVsRestClassifier(RidgeClassifier(normalize=True,alpha = 8))
+    clf = OneVsRestClassifier(LogisticRegression(penalty='l1',C=10))
     clf.fit(X_train,y_train)
     return clf
-    ######################################
-    ######### YOUR CODE HERE #############
-    ######################################    
 
 
 # Train the classifiers for different data transformations: *bag-of-words* and *tf-idf*.
 
-# In[37]:
+# In[32]:
 
 
 classifier_mybag = train_classifier(X_train_mybag, y_train)
 classifier_tfidf = train_classifier(X_train_tfidf, y_train)
+classifier_n_grams=train_classifier(X_train_ng,y_train)
+
+
+# In[33]:
+
+
+y_val_predicted_labels_ng=classifier_n_grams.predict(X_val_ng)
 
 
 # Now you can create predictions for the data. You will need two types of predictions: labels and scores.
 
-# In[40]:
+# In[34]:
 
 
 y_val_predicted_labels_mybag = classifier_mybag.predict(X_val_mybag)
@@ -462,33 +476,7 @@ y_val_predicted_scores_tfidf = classifier_tfidf.decision_function(X_val_tfidf)
 print(y_val_predicted_labels_mybag)
 
 
-# In[42]:
-
-
-y_temp=mlb.inverse_transform(y_val_predicted_labels_mybag)
-print(y_temp)
-
-
 # Now take a look at how classifier, which uses TF-IDF, works for a few examples:
-
-# In[41]:
-
-
-y_val_pred_inversed = mlb.inverse_transform(y_val_predicted_labels_tfidf)
-y_val_inversed = mlb.inverse_transform(y_val)
-for i in range(3):
-    print('Title:\t{}\nTrue labels:\t{}\nPredicted labels:\t{}\n\n'.format(
-        X_val[i],
-        ','.join(y_val_inversed[i]),
-        ','.join(y_val_pred_inversed[i])
-    ))
-
-
-# In[ ]:
-
-
-y_
-
 
 # Now, we would need to compare the results of different predictions, e.g. to see whether TF-IDF transformation helps or to try different regularization techniques in logistic regression. For all these experiments, we need to setup evaluation procedure. 
 
@@ -502,7 +490,7 @@ y_
 #  
 # Make sure you are familiar with all of them. How would you expect the things work for the multi-label scenario? Read about micro/macro/weighted averaging following the sklearn links provided above.
 
-# In[ ]:
+# In[35]:
 
 
 from sklearn.metrics import accuracy_score
@@ -517,26 +505,29 @@ from sklearn.metrics import recall_score
 #  - *F1-score macro/micro/weighted*
 #  - *Precision macro/micro/weighted*
 
-# In[ ]:
+# In[36]:
 
 
 def print_evaluation_scores(y_val, predicted):
-    
-    ######################################
-    ######### YOUR CODE HERE #############
-    ######################################
+
     print(accuracy_score(y_val, predicted))
     print(f1_score(y_val, predicted, average='weighted'))
     print(average_precision_score(y_val, predicted))
 
 
-# In[ ]:
+# IN Multilabel classification f-score is more significant evaluation criteria
+# The problem with Multilabel classification is that even if one of the predicted tags is wrong/extra then 
+# the whole prediction is considered wrong.
+
+# In[37]:
 
 
 print('Bag-of-words')
 print_evaluation_scores(y_val, y_val_predicted_labels_mybag)
 print('Tfidf')
 print_evaluation_scores(y_val, y_val_predicted_labels_tfidf)
+print('N-grams')
+print_evaluation_scores(y_val, y_val_predicted_labels_ng)
 
 
 # **Task 4 (MultilabelClassification).** Once we have the evaluation set up, we suggest that you experiment a bit with training your classifiers. We will use *F1-score weighted* as an evaluation metric. Our recommendation:
@@ -545,26 +536,12 @@ print_evaluation_scores(y_val, y_val_predicted_labels_tfidf)
 # 
 # You also could try other improvements of the preprocessing / model, if you want. 
 
-# In[ ]:
-
-
-
-
-######################################
-######### YOUR CODE HERE #############
-######################################
-
-
-# When you are happy with the quality, create predictions for *test* set, which you will submit to Coursera.
-
-# In[ ]:
+# In[38]:
 
 
 test_predictions = classifier_tfidf.predict(X_test_tfidf)######### YOUR CODE HERE #############
 test_pred_inversed = mlb.inverse_transform(test_predictions)
 
-test_predictions_for_submission = '\n'.join('%i\t%s' % (i, ','.join(row)) for i, row in enumerate(test_pred_inversed))
-grader.submit_tag('MultilabelClassification', test_predictions_for_submission)
 
 
 # ### Analysis of the most important features
@@ -573,7 +550,7 @@ grader.submit_tag('MultilabelClassification', test_predictions_for_submission)
 
 # Implement the function *print_words_for_tag* to find them. Get back to sklearn documentation on [OneVsRestClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.multiclass.OneVsRestClassifier.html) and [LogisticRegression](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) if needed.
 
-# In[ ]:
+# In[39]:
 
 
 def print_words_for_tag(classifier, tag, tags_classes, index_to_words, all_words):
@@ -601,7 +578,7 @@ def print_words_for_tag(classifier, tag, tags_classes, index_to_words, all_words
     print('Top negative words:\t{}\n'.format(', '.join(top_negative_words)))
 
 
-# In[ ]:
+# In[40]:
 
 
 print_words_for_tag(classifier_tfidf, 'c', mlb.classes, tfidf_reversed_vocab, ALL_WORDS)
